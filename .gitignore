@@ -3,16 +3,17 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
+*.Python
 
 config.h
-.env
-.venv/
-.vscode
+*.env
+*.venv/
+*.vscode
 
-.DS_Stores
-
+*.DS_Store
 *.crt
 *.key
 *.srl
+*.csr
 
+.DS_Store
