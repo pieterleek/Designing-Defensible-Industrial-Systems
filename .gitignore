@@ -12,6 +12,7 @@ config.h
 
 .DS_Stores
 
-.crt
-.key
-.srl
+*.crt
+*.key
+*.srl
+
