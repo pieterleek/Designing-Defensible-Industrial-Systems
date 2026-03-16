@@ -1,0 +1,11 @@
+services:
+  ntp:
+    image: cturra/ntp:latest
+    container_name: ntp
+    restart: unless-stopped
+    ports:
+      - "123:123/udp"
+    environment:
+      - NTP_SERVERS=pool.ntp.org
+    cap_add:
+      - SYS_TIME
