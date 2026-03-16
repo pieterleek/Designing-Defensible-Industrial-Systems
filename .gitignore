@@ -1,0 +1,17 @@
+password.txt
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+config.h
+.env
+.venv/
+.vscode
+
+.DS_Stores
+
+.crt
+.key
+.srl
