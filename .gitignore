@@ -15,5 +15,5 @@ config.h
 *.key
 *.srl
 *.csr
-
+*CA passowrd.txt
 .DS_Store
