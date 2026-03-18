@@ -1,0 +1,3 @@
+broker.qmannexus.com {
+    reverse_proxy ignition:8088
+}

@@ -1,0 +1,90 @@
+services:
+
+  step-ca:
+    image: smallstep/step-ca:latest
+    container_name: step-ca
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - step-ca-data:/home/step
+    environment:
+      - DOCKER_STEPCA_INIT_NAME=FactoryCA
+      - DOCKER_STEPCA_INIT_DNS_NAMES=step-ca,localhost
+      - DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
+      - DOCKER_STEPCA_INIT_ACME=true
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+    volumes:
+      - ./broker/mosquitto/config:/mosquitto/config:ro
+      - ./broker/certs:/mosquitto/certs:ro
+      - ./bridge/certs:/mosquitto/bridge:ro
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+
+  ignition:
+    image: inductiveautomation/ignition:8.3.0
+    container_name: ignition
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+      - "8043:8043"
+    volumes:
+      - ignition-data:/usr/local/bin/ignition/data
+      - ./ignition/certs:/certs:ro
+    environment:
+      - ACCEPT_IGNITION_EULA=Y
+      - GATEWAY_ADMIN_USERNAME=admin
+      - GATEWAY_ADMIN_PASSWORD=QmanNexus2026!
+      - IGNITION_EDITION=maker
+    depends_on:
+      - mosquitto
+
+  ntp:
+    image: cturra/ntp:latest
+    container_name: ntp
+    restart: unless-stopped
+    ports:
+      - "123:123/udp"
+    environment:
+      - NTP_SERVERS=pool.ntp.org
+    cap_add:
+      - SYS_TIME
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+  log-shipper:
+    build: ./log-shipper
+    container_name: log-shipper
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /usr/bin/docker:/usr/bin/docker:ro
+    environment:
+      - S3_BUCKET=qmannexus-audit-logs
+      - S3_PREFIX=mosquitto-logs
+      - SHIP_INTERVAL=300
+      - AWS_REGION=eu-central-1
+
+volumes:
+  step-ca-data:
+  mosquitto-data:
+  mosquitto-log:
+  ignition-data:
+  caddy-data:
+  caddy-config:
